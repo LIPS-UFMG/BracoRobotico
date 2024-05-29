@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle do Braço Robótico</title>
+</head>
+<body>
+    <h1>Controle do Braço Robótico</h1>
+    <label for="base">Base:</label>
+    <input type="range" id="base" name="base" min="0" max="180">
+    <br>
+    <label for="arm1">Braço 1:</label>
+    <input type="range" id="arm1" name="arm1" min="0" max="180">
+    <br>
+    <label for="arm2">Braço 2:</label>
+    <input type="range" id="arm2" name="arm2" min="0" max="180">
+    <br>
+    <button id="openClaw">Fechar Garra</button>
+    <button id="closeClaw">Abrir Garra</button>
+    <br><br>
+    <button id="connect">Conectar</button>
+
+    <script>
+        let socket;
+
+        document.getElementById('connect').addEventListener('click', () => {
+            socket = new WebSocket('ws://localhost:8765');
+
+            socket.onopen = () => {
+                console.log('Conectado ao servidor WebSocket');
+                alert('Conectado ao servidor WebSocket');
+            };
+
+            socket.onerror = (error) => {
+                console.error('Erro no WebSocket:', error);
+            };
+
+            socket.onclose = () => {
+                console.log('Desconectado do servidor WebSocket');
+            };
+        });
+
+        document.getElementById('base').addEventListener('input', (event) => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(`BASE:${event.target.value}`);
+            }
+        });
+
+        document.getElementById('arm1').addEventListener('input', (event) => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(`ARM1:${event.target.value}`);
+            }
+        });
+
+        document.getElementById('arm2').addEventListener('input', (event) => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(`ARM2:${event.target.value}`);
+            }
+        });
+
+        document.getElementById('openClaw').addEventListener('click', () => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(`CLAW:90`); // Fechar garra
+            }
+        });
+
+        document.getElementById('closeClaw').addEventListener('click', () => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(`CLAW:0`); // Abrir garra
+            }
+        });
+    </script>
+</body>
+</html>
